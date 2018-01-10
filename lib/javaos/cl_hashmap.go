@@ -65,6 +65,7 @@ func tryToMakeMap(hm java_util_HashMap) interface{} {
 			}
 			ktyp = reflect.TypeOf(hm.entries[1].Key)
 		}
+		// TODO validate for valid key type
 		typ := reflect.MapOf(ktyp, reflect.TypeOf(hm.entries[0].Value))
 		mp = reflect.MakeMap(typ)
 	}

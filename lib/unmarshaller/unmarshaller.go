@@ -12,14 +12,14 @@ type Unmarshaller struct {
 	tt json.Unmarshaler
 }
 
-func Unmarshall(model *javaos.JavaModel, dest interface{}) error {
+func Unmarshal(model *javaos.JavaModel, dest interface{}) error {
 	rv := reflect.ValueOf(dest)
 	for rv.Kind() == reflect.Ptr || rv.Kind() == reflect.Interface {
 		rv = rv.Elem()
 	}
 
 	um := unmarshallerFor(rv.Type())
-	um.Unmarshall(rv, model)
+	um.Unmarshal(rv, model)
 
 	return nil
 }

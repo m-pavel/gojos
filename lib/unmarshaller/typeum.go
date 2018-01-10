@@ -11,7 +11,7 @@ import (
 
 type TypeUnmarshaller interface {
 	MyType(t reflect.Type) bool
-	Unmarshall(value reflect.Value, cls interface{})
+	Unmarshal(value reflect.Value, cls interface{})
 }
 
 type defaultStructUm struct{}
@@ -34,7 +34,7 @@ func (defaultStructUm) Unmarshall(value reflect.Value, cls interface{}) {
 				if !val.CanSet() {
 					log.Printf("Unable to set field %s", t.Field(i).Name)
 				} else {
-					fu.Unmarshall(val, *jf)
+					fu.Unmarshal(val, *jf)
 				}
 			}
 		}
@@ -78,7 +78,7 @@ type dateUm struct{}
 func (dateUm) MyType(t reflect.Type) bool {
 	return t.Name() == "Time" && t.PkgPath() == "time"
 }
-func (dateUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (dateUm) Unmarshal(value reflect.Value, cls interface{}) {
 	if reflect.TypeOf(cls).Name() == "FieldDesc" {
 		cd := cls.(javaos.FieldDesc).Val.GoValue
 		if reflect.TypeOf(cd) != nil {
@@ -92,7 +92,7 @@ type stringUm struct{}
 func (stringUm) MyType(t reflect.Type) bool {
 	return t.Name() == "string"
 }
-func (stringUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (stringUm) Unmarshal(value reflect.Value, cls interface{}) {
 	if reflect.TypeOf(cls).Name() == "FieldDesc" {
 		cd := cls.(javaos.FieldDesc).Val.Value
 		if reflect.TypeOf(cd) != nil {
@@ -106,7 +106,7 @@ type mapUm struct{}
 func (mapUm) MyType(t reflect.Type) bool {
 	return t.Kind() == reflect.Map
 }
-func (mapUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (mapUm) Unmarshal(value reflect.Value, cls interface{}) {
 	cd := cls.(javaos.FieldDesc).Val.GoValue
 	if reflect.TypeOf(cd) != nil && reflect.TypeOf(cd).Kind() == reflect.Map {
 		value.Set(reflect.MakeMap(cd.(reflect.Value).Type()))
@@ -136,7 +136,7 @@ func (uintUm) MyType(t reflect.Type) bool {
 		t.Kind() == reflect.Uint64
 }
 
-func (intUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (intUm) Unmarshal(value reflect.Value, cls interface{}) {
 	if reflect.TypeOf(cls).Name() == "FieldDesc" {
 		cd := cls.(javaos.FieldDesc).Val.Value
 		if reflect.TypeOf(cd) != nil {
@@ -178,7 +178,7 @@ func (intUm) Unmarshall(value reflect.Value, cls interface{}) {
 	}
 }
 
-func (uintUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (uintUm) Unmarshal(value reflect.Value, cls interface{}) {
 	if reflect.TypeOf(cls).Name() == "FieldDesc" {
 		cd := cls.(javaos.FieldDesc).Val.Value
 		if reflect.TypeOf(cd) != nil {
@@ -211,7 +211,7 @@ func (boolUm) MyType(t reflect.Type) bool {
 	return t.Kind() == reflect.Bool
 }
 
-func (boolUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (boolUm) Unmarshal(value reflect.Value, cls interface{}) {
 	if reflect.TypeOf(cls).Name() == "FieldDesc" {
 		cd := cls.(javaos.FieldDesc).Val.Value
 		if reflect.TypeOf(cd) != nil {
@@ -232,7 +232,7 @@ func (floatUm) MyType(t reflect.Type) bool {
 		t.Kind() == reflect.Float64
 }
 
-func (floatUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (floatUm) Unmarshal(value reflect.Value, cls interface{}) {
 	if reflect.TypeOf(cls).Name() == "FieldDesc" {
 		cd := cls.(javaos.FieldDesc).Val.Value
 		if reflect.TypeOf(cd) != nil {
