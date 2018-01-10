@@ -36,7 +36,7 @@ func TestPrimitives(t *testing.T) {
 	}
 	log.Printf("Java model %s", jm)
 	t1 := Primitives{}
-	err = Unmarshall(jm, &t1)
+	err = Unmarshal(jm, &t1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestHierarchy(t *testing.T) {
 	}
 	log.Printf("Java model %s", jm)
 	t1 := Hierarchy{}
-	err = Unmarshall(jm, &t1)
+	err = Unmarshal(jm, &t1)
 	if err != nil {
 		t.Fatal(err)
 	}

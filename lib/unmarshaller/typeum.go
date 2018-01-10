@@ -19,7 +19,7 @@ type defaultStructUm struct{}
 func (defaultStructUm) MyType(t reflect.Type) bool {
 	return t.Kind() == reflect.Struct
 }
-func (defaultStructUm) Unmarshall(value reflect.Value, cls interface{}) {
+func (defaultStructUm) Unmarshal(value reflect.Value, cls interface{}) {
 	t := value.Type()
 	for i := 0; i < t.NumField(); i++ {
 		fu := unmarshallerFor(t.Field(i).Type)

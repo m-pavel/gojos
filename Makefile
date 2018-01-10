@@ -2,12 +2,14 @@
 JAVA_SRC=`find ./java/ -name "*.java"`
 JAVA_TGT=target/classes
 TEST_DT=target/tdata
+
+default: prepare
+	go build .
+
+
 prepare:
 	mkdir -p ${JAVA_TGT}
 	mkdir -p ${TEST_DT}
-
-default:
-	go build .
 
 
 testdata: prepare
