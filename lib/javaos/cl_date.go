@@ -6,7 +6,7 @@ import (
 
 type java_util_Date struct{}
 
-func (*java_util_Date) Name() string {
+func (java_util_Date) Name() string {
 	return "java.util.Date"
 }
 func (d *java_util_Date) Read(s *Stream, cd *ClassDesc) interface{} {
@@ -16,4 +16,8 @@ func (d *java_util_Date) Read(s *Stream, cd *ClassDesc) interface{} {
 	}
 	val := blk.blockReadUint64()
 	return time.Unix(0, int64(val)*int64(time.Millisecond))
+}
+
+func (java_util_Date) newInstance() JavaClassReader {
+	return &java_util_Date{}
 }

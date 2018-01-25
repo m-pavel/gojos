@@ -108,13 +108,16 @@ func (mapUm) MyType(t reflect.Type) bool {
 }
 func (mapUm) Unmarshal(value reflect.Value, cls interface{}) {
 	cd := cls.(javaos.FieldDesc).Val.GoValue
-	if reflect.TypeOf(cd) != nil && reflect.TypeOf(cd).Kind() == reflect.Map {
-		value.Set(reflect.MakeMap(cd.(reflect.Value).Type()))
-		keys := cd.(reflect.Value).MapKeys()
-		for _, key := range keys {
-			value.SetMapIndex(key, cd.(reflect.Value).MapIndex(key))
+	if reflect.TypeOf(cd) != nil && reflect.TypeOf(cd).Kind() == reflect.Struct {
+		if cd.(reflect.Value).Type().Kind() == reflect.Map {
+			value.Set(reflect.MakeMap(cd.(reflect.Value).Type()))
+			keys := cd.(reflect.Value).MapKeys()
+			for _, key := range keys {
+				value.SetMapIndex(key, cd.(reflect.Value).MapIndex(key))
+			}
 		}
 	}
+
 }
 
 type intUm struct{}

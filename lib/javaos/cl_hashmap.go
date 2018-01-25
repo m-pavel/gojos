@@ -16,9 +16,13 @@ type java_util_HashMap struct {
 	entries []Java_util_HashMap_Entry
 }
 
-func (*java_util_HashMap) Name() string {
+func (java_util_HashMap) Name() string {
 	return "java.util.HashMap"
 }
+func (java_util_HashMap) newInstance() JavaClassReader {
+	return &java_util_HashMap{}
+}
+
 func (hm *java_util_HashMap) Read(s *Stream, cd *ClassDesc) interface{} {
 	//
 	cd.Field("loadFactor").Val = RR{}
@@ -49,7 +53,8 @@ func (hm *java_util_HashMap) Read(s *Stream, cd *ClassDesc) interface{} {
 			hm.entries[i] = Java_util_HashMap_Entry{Key: keyv, Value: vv}
 		}
 	}
-	return tryToMakeMap(*hm)
+	gomap := tryToMakeMap(*hm)
+	return gomap
 }
 
 func tryToMakeMap(hm java_util_HashMap) interface{} {

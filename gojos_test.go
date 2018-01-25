@@ -12,6 +12,7 @@ import (
 	"log"
 
 	"github.com/m-pavel/gojos/lib/javaos"
+	"github.com/m-pavel/gojos/lib/unmarshaller"
 )
 
 const (
@@ -59,4 +60,31 @@ func Test55(t *testing.T) {
 		t.Fatal(err)
 	}
 	log.Printf("Go model %s", t1)
+}
+
+type MapStruct struct {
+	Hm map[string]string
+}
+
+func TestHashMap(t *testing.T) {
+	file, err := os.OpenFile("./target/tdata/test44.bin", os.O_RDONLY, 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ms := MapStruct{}
+	jm, err := Deserialize(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Printf("Java model %s", jm)
+
+	javaum.Unmarshal(jm, &ms)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	log.Printf("Go model %s", ms)
+	if len(ms.Hm) != 4 {
+		t.Fatal("Size not 2")
+	}
 }

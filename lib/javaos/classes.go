@@ -3,6 +3,7 @@ package javaos
 type JavaClassReader interface {
 	Name() string
 	Read(s *Stream, cd *ClassDesc) interface{}
+	newInstance() JavaClassReader
 }
 
 var javaClasses = []JavaClassReader{
@@ -13,8 +14,8 @@ var javaClasses = []JavaClassReader{
 func javaClassReaderFor(desc *ClassDesc) JavaClassReader {
 	for _, jc := range javaClasses {
 		if jc.Name() == desc.Name {
-			return jc
+			return jc.newInstance()
 		}
 	}
-	return nil
+	return &defaultJavaClassReader{}
 }

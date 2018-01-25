@@ -9,7 +9,10 @@ import (
 type defaultJavaClassReader struct {
 }
 
-func (*defaultJavaClassReader) Name() string {
+func (defaultJavaClassReader) newInstance() JavaClassReader {
+	return &defaultJavaClassReader{}
+}
+func (defaultJavaClassReader) Name() string {
 	return "__ANY__"
 }
 
