@@ -65,25 +65,15 @@ func procObject(s *Stream) RR {
 	switch rr.Type {
 	case TC_OBJECT:
 		return rr
-		//cd.Fields[idx].ClassDef = JavaModel{rr.Value.([]ClassDesc)}
-		////creader := JavaClassReaderFor(fld.ClassDef.ClassName())
-		//if len((cd.Fields[idx].ClassDef.Classes)) != 1 {
-		//	panic("Unexpected number of classes.")
-		//}
-		//creader := classReaderFor(&cd.Fields[idx].ClassDef.Classes[0])
-		//if creader != nil {
-		//	creader.Read(s)
-		//} else {
-		//	fmt.Printf("No reader for class %s\n", fld.ClassDef.ClassName())
-		//	panic("sad")
-		//}
 	case TC_STRING:
 		return rr
 	case TC_NULL:
 		return RR{Value: nil, Type: TC_NULL} // TODO special value ?
 	case TC_ENDBLOCKDATA:
 		return procObject(s)
+	case TC_REFERENCE:
+		return rr
 	default:
-		panic(fmt.Sprintf("??? %x", rr.Type))
+		panic(fmt.Sprintf("Unknown type 0x%x", rr.Type))
 	}
 }

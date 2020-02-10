@@ -34,13 +34,13 @@ func TestPrimitives(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("Java model %s", jm)
+	log.Printf("Java model %v", jm)
 	t1 := Primitives{}
 	err = Unmarshal(jm, &t1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("Go model %s", t1)
+	log.Printf("Go model %v", t1)
 
 	assert.Equal(t, true, t1.BoolVal)
 	assert.Equal(t, uint8(55), t1.ByteVal)
@@ -62,13 +62,13 @@ func TestHierarchy(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("Java model %s", jm)
+	log.Printf("Java model %v", jm)
 	t1 := Hierarchy{}
 	err = Unmarshal(jm, &t1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("Go model %s", t1)
+	log.Printf("Go model %v", t1)
 
 	assert.Equal(t, "C1", t1.StrVal)
 	assert.Equal(t, (55), t1.IntVal)

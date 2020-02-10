@@ -22,19 +22,30 @@ func (defaultStructUm) MyType(t reflect.Type) bool {
 func (defaultStructUm) Unmarshal(value reflect.Value, cls interface{}) {
 	t := value.Type()
 	for i := 0; i < t.NumField(); i++ {
-		fu := unmarshallerFor(t.Field(i).Type)
+		ftype := t.Field(i).Type
+		tgt := value.Field(i)
+		ptr := false
+		if ftype.Kind() == reflect.Ptr {
+			ftype = t.Field(i).Type.Elem()
+			if value.Field(i).IsNil() {
+				tgt = reflect.New(ftype)
+				value.Field(i).Set(tgt)
+				tgt = tgt.Elem()
+			}
+			ptr = true
+		}
+		fu := unmarshallerFor(ftype)
 		if fu == nil {
-			log.Printf("No unmarshaller for filed %s of type %T", t.Field(i).Name, t.Field(i).Type)
+			log.Printf("No unmarshaller for filed %s of type %s(%T)", t.Field(i).Name, t.Field(i).Type.Name(),t.Field(i).Type)
 		} else {
 			jf := findField(t.Field(i), cls)
 			if jf == nil {
 				log.Printf("Unable to find java mapping for %s", t.Field(i).Name)
 			} else {
-				val := value.Field(i)
-				if !val.CanSet() {
+				if !ptr && !tgt.CanSet() {
 					log.Printf("Unable to set field %s", t.Field(i).Name)
 				} else {
-					fu.Unmarshal(val, *jf)
+					fu.Unmarshal(tgt, *jf)
 				}
 			}
 		}
@@ -57,12 +68,8 @@ func findField(gf reflect.StructField, jf interface{}) *javaos.FieldDesc {
 	if gname == nil {
 		return nil
 	}
-	typ := reflect.TypeOf(jf)
-	if reflect.TypeOf(jf).Kind() == reflect.Ptr {
-		typ = reflect.TypeOf(jf).Elem()
-	}
-	if typ.Name() == "JavaModel" {
-		for _, cls := range jf.(*javaos.JavaModel).Classes {
+	if jm, ok := jf.(*javaos.JavaModel); ok {
+		for _, cls := range  jm.Classes{
 			for _, fld := range cls.Fields {
 				if *gname == fld.Name {
 					return &fld
@@ -70,6 +77,21 @@ func findField(gf reflect.StructField, jf interface{}) *javaos.FieldDesc {
 			}
 		}
 	}
+	// sub object
+	if fd, ok :=  jf.(javaos.FieldDesc); ok {
+		if cls, ok := fd.Val.Value.([]javaos.ClassDesc); ok {
+			for _, cls := range cls {
+				for _, fld := range cls.Fields {
+					if *gname == fld.Name {
+						return &fld
+					}
+				}
+			}
+		} else {
+			return findField(gf, &fd.ClassDef)
+		}
+	}
+	log.Println(gf)
 	return nil
 }
 
