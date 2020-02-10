@@ -14,7 +14,10 @@ func Deserialize(reader io.Reader) (*JavaModel, error) {
 	if STREAM_MAGIC != magic {
 		return nil, errors.New(fmt.Sprintf("Wrong magic %s", magic))
 	}
-	stream.ReadTwo() // version
+	// version
+	if _, _, err := stream.ReadTwo(); err != nil {
+		return nil, err
+	}
 
 	rr := readFor(&stream)
 	return &JavaModel{Classes: rr.Value.([]ClassDesc)}, nil

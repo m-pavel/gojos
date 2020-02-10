@@ -3,6 +3,8 @@ package javaos
 import (
 	"fmt"
 	"io"
+
+	"log"
 )
 
 type objectReader struct{}
@@ -17,33 +19,33 @@ func (*objectReader) Process(s *Stream) RR {
 	for done {
 		typ, err := s.ReadOne()
 		if io.EOF == err {
-			done = false
 			break
 		}
 		switch typ {
 		case TC_CLASSDESC:
 			rr := stateFor(typ).Process(s)
 			cd := rr.Value.(ClassDesc)
-			s.h.assgn(cd)
+			s.h.assgn(&cd)
 			classes = append(classes, cd)
-			break
 		case TC_ENDBLOCKDATA:
 			continue
 		case TC_NULL:
 			done = false
-			break
+		case TC_BLOCKDATA:
+			rr := stateFor(typ).Process(s)
+			log.Println(rr) // TODO no idea what to do
 		case TC_REFERENCE:
 			rr := stateFor(typ).Process(s)
 			cd := s.h.get(rr.Value.(uint32)).(*ClassDesc)
 			gov = readClassData(s, cd)
-			break
 		default:
-			panic(fmt.Sprintf("objectReader %x", typ))
+			panic(fmt.Sprintf("objectReader 0x%x", typ))
 		}
 	}
 
 	for i := len(classes) - 1; i >= 0; i-- {
 		gov = readClassData(s, &classes[i])
+		s.h.assgn(gov)
 	}
 	return RR{Type: TC_OBJECT, Value: classes, GoValue: gov}
 }

@@ -1,7 +1,6 @@
 package test;
 
 import cmd.GojoTest;
-import model.t7.Child;
 import java.io.Serializable;
 
 public class Test8 implements GojoTest<Test8.C> {

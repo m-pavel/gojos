@@ -116,3 +116,25 @@ func Test8_Referrence(t *testing.T) {
 	log.Printf("Go model C.B.A %p", c.B.A)
 	log.Println(c.A.Value)
 }
+
+type C9 struct {
+	D1 time.Time
+	D2 time.Time
+	S string
+}
+
+func Test9_Referrence(t *testing.T) {
+	log.SetFlags(log.Lshortfile)
+	file, err := os.OpenFile("./target/tdata/test9.bin", os.O_RDONLY, 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := C9{}
+	err = UnmarshallStream(file, &c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println(c.D1)
+	log.Println(c.D2)
+	log.Println(c.S)
+}

@@ -23,7 +23,6 @@ func (dr *defaultJavaClassReader) Read(s *Stream, cd *ClassDesc) interface{} {
 		switch fld.Typ {
 		case 0x4c: // L - refference
 			cd.Fields[idx].Val = procObject(s)
-			break
 		case 'Z':
 			b, _ := s.ReadOne()
 			if b == 1 {
@@ -31,28 +30,20 @@ func (dr *defaultJavaClassReader) Read(s *Stream, cd *ClassDesc) interface{} {
 			} else {
 				cd.Fields[idx].Val.Value = false
 			}
-			break
 		case 'B':
 			cd.Fields[idx].Val.Value, _ = s.ReadOne()
-			break
 		case 'C':
 			cd.Fields[idx].Val.Value, _ = s.ReadUint16()
-			break
 		case 'S':
 			cd.Fields[idx].Val.Value, _ = s.ReadUint16()
-			break
 		case 'I':
 			cd.Fields[idx].Val.Value, _ = s.ReadUint32()
-			break
 		case 'F':
 			cd.Fields[idx].Val.Value, _ = s.ReadFloat32()
-			break
 		case 'J':
 			cd.Fields[idx].Val.Value, _ = s.ReadUint64()
-			break
 		case 'D': // double
 			cd.Fields[idx].Val.Value, _ = s.ReadFloat64()
-			break
 		default:
 			panic(fmt.Sprintf("Unknown field %x %s\n", fld.Typ, fld.Name))
 		}
@@ -72,6 +63,8 @@ func procObject(s *Stream) RR {
 	case TC_ENDBLOCKDATA:
 		return procObject(s)
 	case TC_REFERENCE:
+		rv := s.h.get(rr.Value.(uint32))
+		log.Panic(rv)
 		return rr
 	default:
 		panic(fmt.Sprintf("Unknown type 0x%x", rr.Type))

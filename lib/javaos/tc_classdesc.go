@@ -2,6 +2,7 @@ package javaos
 
 import (
 	"fmt"
+	"log"
 )
 
 type classDescReader struct{}
@@ -11,10 +12,13 @@ func (*classDescReader) Type() byte {
 }
 func (*classDescReader) Process(s *Stream) RR {
 	var res ClassDesc
-	s.h.assgn(&res)
 	res.Name, _ = s.ReadStringNoHandle() // TODO could be a ref ???
 	res.SerialVersionUID, _ = s.ReadUint64()
-	s.ReadOne() // flag
+	s.h.assgn(&res)
+	// version
+	if _, err := s.ReadOne(); err != nil {
+		log.Println(err)
+	}
 	nof, _ := s.ReadUint16()
 	res.Fields = make([]FieldDesc, int(nof))
 	var fi uint16
@@ -34,10 +38,8 @@ func readField(s *Stream) FieldDesc {
 		switch val.Type {
 		case TC_STRING:
 			className = val.Value.(string)
-			break
 		case TC_REFERENCE:
 			className = s.h.get(val.Value.(uint32)).(string)
-			break
 		}
 		return FieldDesc{Class: className, Name: fieldName, Typ: typ}
 	case 0x42: // byte
@@ -50,7 +52,6 @@ func readField(s *Stream) FieldDesc {
 	case 0x53: // short
 	default:
 		fmt.Printf("Unknown %x %c %s\n", typ, typ, fieldName)
-		break
 	}
 	return FieldDesc{Name: fieldName, Typ: typ}
 }

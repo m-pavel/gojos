@@ -64,6 +64,6 @@ func (r *RR) blockReadUint64() uint64 {
 	return r.Value.(*blockData).ReadUint64()
 }
 
-func (r *RR) blockReadFloat32() float32 {
-	return r.Value.(*blockData).ReadFloat32()
-}
+//func (r *RR) blockReadFloat32() float32 {
+//	return r.Value.(*blockData).ReadFloat32()
+//}

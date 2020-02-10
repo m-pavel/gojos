@@ -36,11 +36,11 @@ func (defaultStructUm) Unmarshal(value reflect.Value, cls interface{}) {
 		}
 		fu := unmarshallerFor(ftype)
 		if fu == nil {
-			log.Printf("No unmarshaller for filed %s of type %s(%T)", t.Field(i).Name, t.Field(i).Type.Name(),t.Field(i).Type)
+			log.Printf("No unmarshaller for filed %s of type %s(%T)", t.Field(i).Name, t.Field(i).Type.Name(), t.Field(i).Type)
 		} else {
 			jf := findField(t.Field(i), cls)
 			if jf == nil {
-				log.Printf("Unable to find java mapping for %s", t.Field(i).Name)
+				log.Printf("Unable to find java mapping for %s. Is it lowercase field ?", t.Field(i).Name)
 			} else {
 				if !ptr && !tgt.CanSet() {
 					log.Printf("Unable to set field %s", t.Field(i).Name)
@@ -57,6 +57,7 @@ func goFieldName(gf reflect.StructField) *string {
 	if tag != "" {
 		return &tag
 	}
+	// Ignore GO 'private' fields
 	if strings.ToLower(gf.Name[0:1]) == gf.Name[0:1] {
 		return nil
 	}
@@ -69,7 +70,7 @@ func findField(gf reflect.StructField, jf interface{}) *javaos.FieldDesc {
 		return nil
 	}
 	if jm, ok := jf.(*javaos.JavaModel); ok {
-		for _, cls := range  jm.Classes{
+		for _, cls := range jm.Classes {
 			for _, fld := range cls.Fields {
 				if *gname == fld.Name {
 					return &fld
@@ -78,7 +79,7 @@ func findField(gf reflect.StructField, jf interface{}) *javaos.FieldDesc {
 		}
 	}
 	// sub object
-	if fd, ok :=  jf.(javaos.FieldDesc); ok {
+	if fd, ok := jf.(javaos.FieldDesc); ok {
 		if cls, ok := fd.Val.Value.([]javaos.ClassDesc); ok {
 			for _, cls := range cls {
 				for _, fld := range cls.Fields {
@@ -101,10 +102,15 @@ func (dateUm) MyType(t reflect.Type) bool {
 	return t.Name() == "Time" && t.PkgPath() == "time"
 }
 func (dateUm) Unmarshal(value reflect.Value, cls interface{}) {
-	if reflect.TypeOf(cls).Name() == "FieldDesc" {
-		cd := cls.(javaos.FieldDesc).Val.GoValue
-		if reflect.TypeOf(cd) != nil {
-			value.Set(reflect.ValueOf(cd))
+	if fd, ok := cls.(javaos.FieldDesc); ok {
+		cd := fd.Val.GoValue
+		cdt := reflect.TypeOf(cd)
+		if cdt != nil {
+			if cdt.AssignableTo(value.Type()) {
+				value.Set(reflect.ValueOf(cd))
+			} else {
+				log.Printf("value of type %s is not assignable to type %s", cdt.Name(), value.Type().Name())
+			}
 		}
 	}
 }
@@ -169,34 +175,24 @@ func (intUm) Unmarshal(value reflect.Value, cls interface{}) {
 			switch reflect.TypeOf(cd).Kind() {
 			case reflect.Int:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(int))
-				break
 			case reflect.Int8:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(int8))
-				break
 			case reflect.Int16:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(int16))
-				break
 			case reflect.Int32:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(int32))
-				break
 			case reflect.Int64:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(int64))
-				break
 			case reflect.Uint:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(uint))
-				break
 			case reflect.Uint8:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(uint8))
-				break
 			case reflect.Uint16:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(uint16))
-				break
 			case reflect.Uint32:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(uint32))
-				break
 			case reflect.Uint64:
 				intVal = int64(cls.(javaos.FieldDesc).Val.Value.(uint64))
-				break
 			}
 			value.SetInt(intVal)
 		}
@@ -211,19 +207,14 @@ func (uintUm) Unmarshal(value reflect.Value, cls interface{}) {
 			switch reflect.TypeOf(cd).Kind() {
 			case reflect.Uint:
 				intVal = uint64(cls.(javaos.FieldDesc).Val.Value.(uint))
-				break
 			case reflect.Uint8:
 				intVal = uint64(cls.(javaos.FieldDesc).Val.Value.(uint8))
-				break
 			case reflect.Uint16:
 				intVal = uint64(cls.(javaos.FieldDesc).Val.Value.(uint16))
-				break
 			case reflect.Uint32:
 				intVal = uint64(cls.(javaos.FieldDesc).Val.Value.(uint32))
-				break
 			case reflect.Uint64:
 				intVal = uint64(cls.(javaos.FieldDesc).Val.Value.(uint64))
-				break
 			}
 			value.SetUint(intVal)
 		}
@@ -243,7 +234,6 @@ func (boolUm) Unmarshal(value reflect.Value, cls interface{}) {
 			switch reflect.TypeOf(cd).Kind() {
 			case reflect.Bool:
 				value.SetBool(cls.(javaos.FieldDesc).Val.Value.(bool))
-				break
 			}
 
 		}
@@ -265,10 +255,8 @@ func (floatUm) Unmarshal(value reflect.Value, cls interface{}) {
 			switch reflect.TypeOf(cd).Kind() {
 			case reflect.Float32:
 				fVal = float64(cls.(javaos.FieldDesc).Val.Value.(float32))
-				break
 			case reflect.Float64:
 				fVal = float64(cls.(javaos.FieldDesc).Val.Value.(float64))
-				break
 			}
 			value.SetFloat(fVal)
 		}
