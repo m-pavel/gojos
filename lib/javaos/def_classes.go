@@ -2,8 +2,7 @@ package javaos
 
 import (
 	"fmt"
-
-	"github.com/cenkalti/log"
+	"log"
 )
 
 type defaultJavaClassReader struct {
@@ -18,8 +17,7 @@ func (defaultJavaClassReader) Name() string {
 
 func (dr *defaultJavaClassReader) Read(s *Stream, cd *ClassDesc) interface{} {
 	for idx, fld := range cd.Fields {
-		log.Debugf("Reading field %s\n", fld.Name)
-		//cd.Fields[idx].Val = RR{}
+		//log.Printf("Reading field %s\n", fld.Name)
 		switch fld.Typ {
 		case 0x4c: // L - refference
 			cd.Fields[idx].Val = procObject(s)
@@ -64,8 +62,12 @@ func procObject(s *Stream) RR {
 		return procObject(s)
 	case TC_REFERENCE:
 		rv := s.h.get(rr.Value.(uint32))
-		log.Panic(rv)
-		return rr
+		if rvc, ok := rv.(*ClassDesc); ok {
+			return RR{Type: TC_OBJECT, GoValue: rv, Value: []ClassDesc{*rvc}}
+		} else {
+			log.Println("Reference not to ClassDesc")
+			return rr
+		}
 	default:
 		panic(fmt.Sprintf("Unknown type 0x%x", rr.Type))
 	}

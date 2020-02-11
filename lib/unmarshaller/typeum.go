@@ -92,7 +92,6 @@ func findField(gf reflect.StructField, jf interface{}) *javaos.FieldDesc {
 			return findField(gf, &fd.ClassDef)
 		}
 	}
-	log.Println(gf)
 	return nil
 }
 

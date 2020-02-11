@@ -1,8 +1,10 @@
 package javaos
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
+	"time"
 
 	"log"
 )
@@ -34,12 +36,15 @@ func (*objectReader) Process(s *Stream) RR {
 		case TC_BLOCKDATA:
 			rr := stateFor(typ).Process(s)
 			log.Println(rr) // TODO no idea what to do
+			vv := binary.BigEndian.Uint64(rr.Value.(*blockData).val)
+			log.Println(vv)
+			log.Println(time.Unix(0, int64(vv)*int64(time.Millisecond)))
 		case TC_REFERENCE:
 			rr := stateFor(typ).Process(s)
 			cd := s.h.get(rr.Value.(uint32)).(*ClassDesc)
-			gov = readClassData(s, cd)
+			classes = append(classes, *cd)
 		default:
-			panic(fmt.Sprintf("objectReader 0x%x", typ))
+			panic(fmt.Sprintf("objtimeectReader 0x%x", typ))
 		}
 	}
 

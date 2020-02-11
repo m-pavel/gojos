@@ -6,10 +6,6 @@ import (
 	"github.com/m-pavel/gojos/lib/javaos"
 )
 
-type Unmarshaller struct {
-	//tt json.Unmarshaler
-}
-
 func Unmarshal(model *javaos.JavaModel, dest interface{}) error {
 	rv := reflect.ValueOf(dest)
 	for rv.Kind() == reflect.Ptr || rv.Kind() == reflect.Interface {

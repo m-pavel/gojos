@@ -34,12 +34,15 @@ func doTest(fname string, t *testing.T) (res *javaos.JavaModel) {
 }
 
 func TestAllParse(t *testing.T) {
-	filepath.Walk(fldr, func(path string, f os.FileInfo, _ error) error {
+	err := filepath.Walk(fldr, func(path string, f os.FileInfo, _ error) error {
 		if !f.IsDir() {
 			doTest(path, t)
 		}
 		return nil
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 type Tkn struct {
@@ -78,7 +81,7 @@ func TestHashMap(t *testing.T) {
 	}
 	log.Printf("Java model %v", jm)
 
-	javaum.Unmarshal(jm, &ms)
+	err = javaum.Unmarshal(jm, &ms)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,6 +102,7 @@ type C struct {
 	A *A
 	B *B
 }
+
 func Test8_Referrence(t *testing.T) {
 	log.SetFlags(log.Lshortfile)
 	file, err := os.OpenFile("./target/tdata/test8.bin", os.O_RDONLY, 0644)
@@ -115,12 +119,13 @@ func Test8_Referrence(t *testing.T) {
 	log.Printf("Go model C.B %p", c.B)
 	log.Printf("Go model C.B.A %p", c.B.A)
 	log.Println(c.A.Value)
+	log.Println(c.B.A.Value)
 }
 
 type C9 struct {
 	D1 time.Time
 	D2 time.Time
-	S string
+	S  string
 }
 
 func Test9_Referrence(t *testing.T) {
