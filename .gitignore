@@ -4,3 +4,4 @@
 .idea/
 target/
 priv_test.go
+go.sum
