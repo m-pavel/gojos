@@ -55,15 +55,3 @@ func (bd *blockData) ReadUint64() uint64 {
 func (bd *blockData) ReadFloat32() float32 {
 	return math.Float32frombits(bd.ReadUint32())
 }
-
-func (r *RR) blockReadUint32() uint32 {
-	return r.Value.(*blockData).ReadUint32()
-}
-
-func (r *RR) blockReadUint64() uint64 {
-	return r.Value.(*blockData).ReadUint64()
-}
-
-//func (r *RR) blockReadFloat32() float32 {
-//	return r.Value.(*blockData).ReadFloat32()
-//}

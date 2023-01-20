@@ -16,16 +16,24 @@ func (*classDescReader) Process(s *Stream) RR {
 	res.SerialVersionUID, _ = s.ReadUint64()
 	s.h.assgn(&res)
 	// version
-	if _, err := s.ReadOne(); err != nil {
-		log.Println(err)
+	if classDescFlags, err := s.ReadOne(); err != nil {
+		log.Println(err) // panic ?
+	} else {
+		if classDescFlags&SC_WRITE_METHOD != 0 {
+			if !hasCustomClassReader(res.Name) {
+				log.Printf("Class %s defines its own writeObject method but no custom reader is defined.", res.Name)
+			}
+		}
 	}
+
 	nof, _ := s.ReadUint16()
 	res.Fields = make([]FieldDesc, int(nof))
 	var fi uint16
 	for fi = 0; fi < nof; fi++ {
 		res.Fields[fi] = readField(s)
 	}
-	return RR{Type: TC_CLASSDESC, Value: res}
+	s.c[res.Name] = &res
+	return RR{Type: TC_CLASSDESC, Value: &res}
 }
 
 func readField(s *Stream) FieldDesc {

@@ -3,6 +3,7 @@ package javaos
 type JavaClassReader interface {
 	Name() string
 	Read(s *Stream, cd *ClassDesc) interface{}
+	ReadFromBlock(bd *blockData) interface{}
 	newInstance() JavaClassReader
 }
 
@@ -18,4 +19,13 @@ func javaClassReaderFor(desc *ClassDesc) JavaClassReader {
 		}
 	}
 	return &defaultJavaClassReader{}
+}
+
+func hasCustomClassReader(class string) bool {
+	for _, jc := range javaClasses {
+		if jc.Name() == class {
+			return true
+		}
+	}
+	return false
 }

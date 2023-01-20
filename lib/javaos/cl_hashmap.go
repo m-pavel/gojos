@@ -30,9 +30,10 @@ func (hm *java_util_HashMap) Read(s *Stream, cd *ClassDesc) interface{} {
 	cd.Field("threshold").Val = RR{}
 	cd.Field("threshold").Val.Value, _ = s.ReadUint32()
 	bd := readFor(s)
+	block := bd.Value.(*blockData)
 
-	hm.buckets = bd.blockReadUint32()
-	hm.size = int(bd.blockReadUint32())
+	hm.buckets = block.ReadUint32()
+	hm.size = int(block.ReadUint32())
 	hm.entries = make([]Java_util_HashMap_Entry, hm.size)
 	if hm.size > 0 {
 		for i := 0; i < hm.size; i++ {
@@ -57,6 +58,10 @@ func (hm *java_util_HashMap) Read(s *Stream, cd *ClassDesc) interface{} {
 	return gomap
 }
 
+func (hm *java_util_HashMap) ReadFromBlock(bd *blockData) interface{} {
+	panic("TODO Implement")
+}
+
 func tryToMakeMap(hm java_util_HashMap) interface{} {
 	var mp reflect.Value
 	var ktyp reflect.Type
@@ -71,8 +76,16 @@ func tryToMakeMap(hm java_util_HashMap) interface{} {
 			ktyp = reflect.TypeOf(hm.entries[1].Key)
 		}
 		// TODO validate for valid key type
-		typ := reflect.MapOf(ktyp, reflect.TypeOf(hm.entries[0].Value))
-		mp = reflect.MakeMap(typ)
+		var vtype reflect.Type
+		for i := range hm.entries {
+			if hm.entries[i].Value != nil {
+				vtype = reflect.MapOf(ktyp, reflect.TypeOf(hm.entries[i].Value))
+			}
+		}
+		if vtype == nil {
+			vtype = reflect.MapOf(ktyp, reflect.TypeOf(reflect.Interface))
+		}
+		mp = reflect.MakeMap(vtype)
 	}
 	//mp := make(map[interface{}]interface{}, 0)
 	for _, e := range hm.entries {

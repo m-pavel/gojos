@@ -19,10 +19,10 @@ type FieldDesc struct {
 	Typ      byte
 	Name     string
 	Class    string
-	ClassDef JavaModel
+	ClassDef *ClassDesc
 	Val      RR
 }
 
 type JavaModel struct {
-	Classes []ClassDesc
+	Classes []*ClassDesc
 }

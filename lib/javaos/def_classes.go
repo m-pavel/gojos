@@ -20,6 +20,7 @@ func (dr *defaultJavaClassReader) Read(s *Stream, cd *ClassDesc) interface{} {
 		//log.Printf("Reading field %s\n", fld.Name)
 		switch fld.Typ {
 		case 0x4c: // L - refference
+			// className := strings.ReplaceAll(cd.Fields[idx].Class[1:len(cd.Fields[idx].Class)-1], "/", ".")
 			cd.Fields[idx].Val = procObject(s)
 		case 'Z':
 			b, _ := s.ReadOne()
@@ -47,6 +48,10 @@ func (dr *defaultJavaClassReader) Read(s *Stream, cd *ClassDesc) interface{} {
 		}
 	}
 	return cd
+}
+
+func (dr *defaultJavaClassReader) ReadFromBlock(bd *blockData) interface{} {
+	panic("TODO Implement")
 }
 
 func procObject(s *Stream) RR {

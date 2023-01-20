@@ -14,7 +14,11 @@ func (d *java_util_Date) Read(s *Stream, cd *ClassDesc) interface{} {
 	if blk.Type != TC_BLOCKDATA {
 		panic("Unexpectable!!!")
 	}
-	val := blk.blockReadUint64()
+	return d.ReadFromBlock(blk.Value.(*blockData))
+}
+
+func (d *java_util_Date) ReadFromBlock(bd *blockData) interface{} {
+	val := bd.ReadUint64()
 	return time.Unix(0, int64(val)*int64(time.Millisecond))
 }
 

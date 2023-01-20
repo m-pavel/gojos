@@ -10,10 +10,11 @@ type Stream struct {
 	r   io.Reader
 	h   Handles
 	blk *blockData
+	c   map[string]*ClassDesc
 }
 
 func NewStream(r io.Reader) Stream {
-	return Stream{r: r, h: Handles{}}
+	return Stream{r: r, h: Handles{}, c: map[string]*ClassDesc{}}
 }
 
 func (s *Stream) read(count int) ([]byte, error) {

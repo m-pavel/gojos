@@ -12,7 +12,8 @@ import (
 	"log"
 
 	"github.com/m-pavel/gojos/lib/javaos"
-	"github.com/m-pavel/gojos/lib/unmarshaller"
+	javaum "github.com/m-pavel/gojos/lib/unmarshaller"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -22,13 +23,9 @@ const (
 func doTest(fname string, t *testing.T) (res *javaos.JavaModel) {
 	log.Printf("Testing %v\n", fname)
 	file, err := os.OpenFile(fname, os.O_RDONLY, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	res, err = Deserialize(file)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	fmt.Println(res)
 	return res
 }
@@ -40,9 +37,7 @@ func TestAllParse(t *testing.T) {
 		}
 		return nil
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 }
 
 type Tkn struct {
@@ -54,14 +49,10 @@ type Tkn struct {
 
 func Test55(t *testing.T) {
 	file, err := os.OpenFile("./target/tdata/test55.bin", os.O_RDONLY, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	t1 := Tkn{}
 	err = UnmarshallStream(file, &t1)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	log.Printf("Go model %v", t1)
 }
 
@@ -71,25 +62,17 @@ type MapStruct struct {
 
 func TestHashMap(t *testing.T) {
 	file, err := os.OpenFile("./target/tdata/test44.bin", os.O_RDONLY, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	ms := MapStruct{}
 	jm, err := Deserialize(file)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	log.Printf("Java model %v", jm)
 
 	err = javaum.Unmarshal(jm, &ms)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	log.Printf("Go model %v", ms)
-	if len(ms.Hm) != 4 {
-		t.Fatal("Size not 2")
-	}
+	assert.Equal(t, 4, ms.Hm)
 }
 
 type A struct {
@@ -106,14 +89,10 @@ type C struct {
 func Test8_Referrence(t *testing.T) {
 	log.SetFlags(log.Lshortfile)
 	file, err := os.OpenFile("./target/tdata/test8.bin", os.O_RDONLY, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	c := C{}
 	err = UnmarshallStream(file, &c)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	log.Printf("Go model C %v", c)
 	log.Printf("Go model C.A %p", c.A)
 	log.Printf("Go model C.B %p", c.B)
@@ -131,14 +110,10 @@ type C9 struct {
 func Test9_Referrence(t *testing.T) {
 	log.SetFlags(log.Lshortfile)
 	file, err := os.OpenFile("./target/tdata/test9.bin", os.O_RDONLY, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	c := C9{}
 	err = UnmarshallStream(file, &c)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 	log.Println(c.D1)
 	log.Println(c.D2)
 	log.Println(c.S)
