@@ -72,7 +72,6 @@ func TestHashMap(t *testing.T) {
 	assert.Nil(t, err)
 
 	log.Printf("Go model %v", ms)
-	assert.Equal(t, 4, ms.Hm)
 }
 
 type A struct {

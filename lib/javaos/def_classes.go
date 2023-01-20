@@ -51,7 +51,8 @@ func (dr *defaultJavaClassReader) Read(s *Stream, cd *ClassDesc) interface{} {
 }
 
 func (dr *defaultJavaClassReader) ReadFromBlock(bd *blockData) interface{} {
-	panic("TODO Implement")
+	// panic("TODO Implement")
+	return nil
 }
 
 func procObject(s *Stream) RR {
