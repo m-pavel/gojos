@@ -24,7 +24,7 @@ func (*objectReader) Process(s *Stream) RR {
 		case TC_CLASSDESC:
 			rr := stateFor(typ).Process(s)
 			cd := rr.Value.(*ClassDesc)
-			s.h.assgn(&cd)
+			s.h.assgn(cd)
 			classes = append(classes, cd)
 		case TC_ENDBLOCKDATA:
 			continue
